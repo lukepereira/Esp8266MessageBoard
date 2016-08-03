@@ -19,14 +19,14 @@ HU serves as an example of the ad-hoc mesh networks that will be possible as har
 
 Over 750,000 bytes of memory remain for new threads, replies and polls, saved in a flat file database.   
 
-![alt tag](Esp8266MessageBoard/Images/board.png)
+![alt tag](https://raw.githubusercontent.com/lukepereira/Esp8266MessageBoard/master/Images/board.png)
 
 
 Includes a Captive Portal and DNS Liar to redirect all new traffic to the homepage.
 
-![alt tag](Esp8266MessageBoard/Images/captive_portal.jpg)
+![alt tag](https://raw.githubusercontent.com/lukepereira/Esp8266MessageBoard/master/Images/captive_portal.jpg)
 
 
 Powered by any USB port, may be powered by lithium cell. 
 
-![alt tag](Esp8266MessageBoard/Images/module.jpg)
+![alt tag](https://raw.githubusercontent.com/lukepereira/Esp8266MessageBoard/master/Images/module.jpg)
