@@ -4,7 +4,9 @@
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <EEPROM.h>
-#include <FS.h>   
+#include <FS.h>  
+#include <ArduinoJson.h>
+#include "WiFiClientPrint.h" 
 
 /*
  * This example serves a "hello world" on a WLAN and a SoftAP at the same time.
@@ -19,14 +21,14 @@
  */
 
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
-const char *softAP_ssid = "open";
-const char *softAP_password = "test";
+const char *softAP_ssid = "union";
+const char *softAP_password = "";
 
 /* hostname for mDNS. Should work at least on windows. Try http://esp8266.local */
-const char *myHostname = "esp8266";
+const char *myHostname = "union";
 
 /* Don't set this wifi credentials. They are configurated at runtime and stored on EEPROM */
-char ssid[32] = "";
+char ssid[32] = "union";
 char password[32] = "";
 
 // DNS server
@@ -53,7 +55,7 @@ int status = WL_IDLE_STATUS;
 /* Message Board */
 int threadID = 0;
 
-
+char *table = (char*)malloc(1000);
 
 void setup() {
   delay(1000);
@@ -66,15 +68,20 @@ void setup() {
   delay(500); // Without delay I've seen the IP address blank
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
-  SPIFFS.begin();
-  SPIFFS.format();
+  if (!SPIFFS.format()){
+    Serial.print("file system format failed");
+  }
+  if (!SPIFFS.begin()){
+    Serial.print("file system mount failed");
+  }
+  
   /* Setup the DNS server redirecting all the domains to the apIP */  
   dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
   dnsServer.start(DNS_PORT, "*", apIP);
 
   /* Setup web pages: root, wifi config pages, SO captive portal detectors and not found. */
-  server.on("/", handleRoot);
-  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/", handleBoard);
+  server.on("/generate_204", handleBoard);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/wifi", handleWifi);
   server.on("/wifisave", handleWifiSave);
@@ -82,6 +89,7 @@ void setup() {
   server.on("/boardsave", handleBoardSave);
   server.on("/thread", handleThread);
   server.on("/threadsave", handleThreadSave);
+  server.on("/about", handleRoot);
   server.onNotFound ( handleNotFound );
   server.begin(); // Web server start
   Serial.println("HTTP server started");
